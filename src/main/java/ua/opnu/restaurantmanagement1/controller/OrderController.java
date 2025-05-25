@@ -1,8 +1,9 @@
 package ua.opnu.restaurantmanagement1.controller;
 
-import ua.opnu.restaurantmanagement1.entity.Order;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ua.opnu.restaurantmanagement1.dto.OrderRequest;
+import ua.opnu.restaurantmanagement1.entity.Order;
 import ua.opnu.restaurantmanagement1.service.OrderService;
 
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.util.List;
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
 public class OrderController {
+
     private final OrderService service;
 
     @GetMapping
@@ -34,9 +36,10 @@ public class OrderController {
         return service.getByWaiter(waiterId);
     }
 
+    // 🔧 ОНОВЛЕНИЙ метод створення замовлення
     @PostMapping
-    public Order create(@RequestBody Order order) {
-        return service.save(order);
+    public Order create(@RequestBody OrderRequest request) {
+        return service.create(request);
     }
 
     @PutMapping("/{orderId}/add-dish/{dishId}")

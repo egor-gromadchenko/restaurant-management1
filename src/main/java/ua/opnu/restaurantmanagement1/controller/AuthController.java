@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ua.opnu.restaurantmanagement1.dto.AuthResponse;
 import ua.opnu.restaurantmanagement1.dto.LoginRequest;
 import ua.opnu.restaurantmanagement1.dto.RegisterRequest;
+import ua.opnu.restaurantmanagement1.repository.UserRepository;
 import ua.opnu.restaurantmanagement1.service.AuthService;
 
 @RestController
@@ -14,6 +15,7 @@ import ua.opnu.restaurantmanagement1.service.AuthService;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserRepository userRepository;
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
@@ -24,5 +26,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @DeleteMapping("/all")
+    public ResponseEntity<String> deleteAllUsers() {
+        userRepository.deleteAll();
+        return ResponseEntity.ok("Усі користувачі видалені");
     }
 }

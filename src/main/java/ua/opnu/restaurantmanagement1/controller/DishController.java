@@ -1,8 +1,9 @@
 package ua.opnu.restaurantmanagement1.controller;
 
-import ua.opnu.restaurantmanagement1.entity.Dish;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ua.opnu.restaurantmanagement1.entity.Dish;
 import ua.opnu.restaurantmanagement1.service.DishService;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
 @RequestMapping("/api/dishes")
 @RequiredArgsConstructor
 public class DishController {
+
     private final DishService service;
 
     @GetMapping
@@ -28,13 +30,20 @@ public class DishController {
         return service.update(id, d);
     }
 
-    @PutMapping("/{dishId}/assign-category/{categoryId}")
-    public void assignCategory(@PathVariable Long dishId, @PathVariable Long categoryId) {
-        service.assignCategory(dishId, categoryId);
-    }
-
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         service.delete(id);
+    }
+
+    @PostMapping("/{dishId}/category/{categoryId}")
+    public ResponseEntity<String> assignCategory(@PathVariable Long dishId, @PathVariable Long categoryId) {
+        service.assignCategory(dishId, categoryId);
+        return ResponseEntity.ok("Категорію призначено");
+    }
+
+    // ✅ ДОДАНО: Popular Dishes
+    @GetMapping("/popular")
+    public List<Object[]> getPopularDishes() {
+        return service.getPopularDishes();
     }
 }

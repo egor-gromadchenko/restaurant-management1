@@ -1,19 +1,22 @@
 package ua.opnu.restaurantmanagement1.service;
 
-import ua.opnu.restaurantmanagement1.entity.Dish;
-import ua.opnu.restaurantmanagement1.entity.DishCategory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ua.opnu.restaurantmanagement1.entity.Dish;
+import ua.opnu.restaurantmanagement1.entity.DishCategory;
 import ua.opnu.restaurantmanagement1.repository.DishCategoryRepository;
 import ua.opnu.restaurantmanagement1.repository.DishRepository;
+import ua.opnu.restaurantmanagement1.repository.OrderRepository;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class DishService {
+
     private final DishRepository dishRepository;
     private final DishCategoryRepository categoryRepository;
+    private final OrderRepository orderRepository;
 
     public List<Dish> getAll() {
         return dishRepository.findAll();
@@ -43,5 +46,9 @@ public class DishService {
 
     public void delete(Long id) {
         dishRepository.deleteById(id);
+    }
+
+    public List<Object[]> getPopularDishes() {
+        return orderRepository.findMostOrderedDishes();
     }
 }

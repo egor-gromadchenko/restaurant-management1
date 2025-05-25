@@ -7,11 +7,33 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
   datasource:
-    url: jdbc:postgresql:dpg-d0bo0jadbo4c73cutfg0-a/restaurant_management_j8v0
+    url: jdbc:postgresql://dpg-d0bo0jadbo4c73cutfg0-a.frankfurt-postgres.render.com/restaurant_management_j8v0
     username: egor_gromadchenko
     password: Dxrolf4dgIW4Yjk379U9KB0OG4YuISaS
     driverClassName: org.postgresql.Driver
+
   sql:
     init:
       platform: postgres
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 390792237094-cf900oioa9jr845k6epa2gcrtp32teqe.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - openid
+              - email
+              - profile
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            client-name: Google
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            user-name-attribute: sub

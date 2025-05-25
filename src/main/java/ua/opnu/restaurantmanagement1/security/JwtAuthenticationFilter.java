@@ -28,20 +28,47 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
+        String path = request.getServletPath();
+        System.out.println("📎 Request path: " + path);
+
+        if (path.startsWith("/api/auth/")) {
+            System.out.println("🔓 Skipping JWT filter for auth path.");
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String username;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            System.out.println("⛔ Missing or invalid Authorization header.");
             filterChain.doFilter(request, response);
             return;
         }
 
         jwt = authHeader.substring(7);
-        username = jwtService.getUsernameFromToken(jwt);
+        System.out.println("🪪 JWT: " + jwt);
+
+        try {
+            username = jwtService.getUsernameFromToken(jwt);
+            System.out.println("✅ Username from token: " + username);
+        } catch (Exception e) {
+            System.out.println("❌ Error extracting username from token: " + e.getMessage());
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            UserDetails userDetails;
+            try {
+                userDetails = userDetailsService.loadUserByUsername(username);
+                System.out.println("✅ Loaded user: " + userDetails.getUsername());
+            } catch (Exception e) {
+                System.out.println("❌ User not found in DB: " + e.getMessage());
+                filterChain.doFilter(request, response);
+                return;
+            }
 
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                     userDetails,
@@ -51,8 +78,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authToken);
+            System.out.println("🔐 User authenticated");
         }
 
         filterChain.doFilter(request, response);
     }
 }
+
