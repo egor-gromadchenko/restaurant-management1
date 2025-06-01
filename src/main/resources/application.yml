@@ -9,7 +9,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   datasource:
-    url: jdbc:postgresql://dpg-d0bo0jadbo4c73cutfg0-a.frankfurt-postgres.render.com/restaurant_management_j8v0
+    url: jdbc:postgresql://dpg-d0bo0jadbo4c73cutfg0-a/restaurant_management_j8v0
     username: egor_gromadchenko
     password: Dxrolf4dgIW4Yjk379U9KB0OG4YuISaS
     driverClassName: org.postgresql.Driver
