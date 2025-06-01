@@ -10,8 +10,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://dpg-d0bo0jadbo4c73cutfg0-a/restaurant_management_j8v0
-    username: egor_gromadchenko
-    password: Dxrolf4dgIW4Yjk379U9KB0OG4YuISaS
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driverClassName: org.postgresql.Driver
 
   sql:
@@ -23,8 +23,8 @@ spring:
       client:
         registration:
           google:
-            client-id: 390792237094-cf900oioa9jr845k6epa2gcrtp32teqe.apps.googleusercontent.com
-            client-secret: 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
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             scope:
               - openid
               - email
