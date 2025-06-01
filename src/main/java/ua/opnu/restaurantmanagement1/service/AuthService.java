@@ -19,11 +19,14 @@ public class AuthService {
     private final JwtService jwtService;
 
     public void register(RegisterRequest request) {
+        Role role = request.getRole() != null ? request.getRole() : Role.USER;
+
         User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
+                .role(role)
                 .build();
+
         userRepository.save(user);
     }
 

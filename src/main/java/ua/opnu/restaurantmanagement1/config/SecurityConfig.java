@@ -28,12 +28,27 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(auth -> auth
+                        // 🔓 Публічні маршрути
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/oauth2/**",
                                 "/login/**",
                                 "/api/dishes/popular"
                         ).permitAll()
+
+                        // 🔐 Лише для ADMIN
+                        .requestMatchers(
+                                "/api/dishes/**",
+                                "/api/waiters/**",
+                                "/api/categories/**"
+                        ).hasRole("ADMIN")
+
+                        // 🔐 Для USER і ADMIN
+                        .requestMatchers(
+                                "/api/orders/**",
+                                "/api/customers/**"
+                        ).hasAnyRole("USER", "ADMIN")
+
                         .anyRequest().authenticated()
                 )
 
