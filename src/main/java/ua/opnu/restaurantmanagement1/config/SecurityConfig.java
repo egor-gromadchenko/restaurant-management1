@@ -28,7 +28,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
 
                 .authorizeHttpRequests(auth -> auth
-                        // 🔓 Публічні маршрути
+
+                        // Публічні маршрути
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/oauth2/**",
@@ -36,26 +37,29 @@ public class SecurityConfig {
                                 "/api/dishes/popular"
                         ).permitAll()
 
-                        // 🔐 Лише для ADMIN
+                        // Доступ лише для ADMIN
                         .requestMatchers(
                                 "/api/dishes/**",
                                 "/api/waiters/**",
                                 "/api/categories/**"
                         ).hasRole("ADMIN")
 
-                        // 🔐 Для USER і ADMIN
+                        // Доступ для USER та ADMIN
                         .requestMatchers(
                                 "/api/orders/**",
                                 "/api/customers/**"
                         ).hasAnyRole("USER", "ADMIN")
 
+                        // Усі інші запити — лише для авторизованих користувачів
                         .anyRequest().authenticated()
                 )
 
+                // Stateless: без збереження сесій
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
+                // Обробка помилок авторизації
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -64,6 +68,7 @@ public class SecurityConfig {
                         })
                 )
 
+                // Логін через Google OAuth2
                 .oauth2Login(oauth -> oauth
                         .successHandler(oAuth2SuccessHandler)
                 );
