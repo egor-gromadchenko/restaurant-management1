@@ -30,11 +30,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getAttribute("email");
 
-        // 🆕 Якщо користувача немає — створити
         User user = userRepository.findByUsername(email)
                 .orElseGet(() -> {
                     User newUser = User.builder()
                             .username(email)
+                            .password("") // Google-юзер не має паролю
                             .role(Role.USER)
                             .build();
                     return userRepository.save(newUser);
@@ -43,6 +43,8 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String token = jwtService.generateToken(user);
 
         response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
         response.getWriter().write("{\"token\": \"" + token + "\"}");
+        response.getWriter().flush();
     }
 }

@@ -41,7 +41,6 @@ public class DishController {
         return ResponseEntity.ok("Категорію призначено");
     }
 
-    // ✅ ДОДАНО: Popular Dishes
     @GetMapping("/popular")
     public List<Object[]> getPopularDishes() {
         return service.getPopularDishes();

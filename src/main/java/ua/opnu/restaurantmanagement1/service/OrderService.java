@@ -41,7 +41,6 @@ public class OrderService {
         return orderRepository.findByWaiterId(waiterId);
     }
 
-    // 🔧 ОНОВЛЕНИЙ МЕТОД СТВОРЕННЯ ЗАМОВЛЕННЯ
     public Order create(OrderRequest request) {
         Customer customer = customerRepository.findById(request.getCustomerId())
                 .orElseThrow(() -> new RuntimeException("Клієнт не знайдений"));

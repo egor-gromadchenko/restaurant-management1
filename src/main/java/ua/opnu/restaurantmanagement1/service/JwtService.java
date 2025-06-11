@@ -17,7 +17,7 @@ public class JwtService {
     private static final String SECRET = "MYSECRETKEYSECRETKEYSECRETKEYSECRETKEY123!";
     private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
 
-    // 🔐 Генерація токена з роллю
+    //Генерація токена
     public String generateToken(User user) {
         return Jwts.builder()
                 .setSubject(user.getUsername())
@@ -28,7 +28,7 @@ public class JwtService {
                 .compact();
     }
 
-    // 📌 Отримати ім'я користувача з токена
+    // Отримати ім'я користувача з токена
     public String getUsernameFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -38,7 +38,7 @@ public class JwtService {
                 .getSubject();
     }
 
-    // 📌 Отримати роль користувача з токена
+    // Отримати роль користувача з токена
     public String getRoleFromToken(String token) {
         return (String) Jwts.parserBuilder()
                 .setSigningKey(key)
