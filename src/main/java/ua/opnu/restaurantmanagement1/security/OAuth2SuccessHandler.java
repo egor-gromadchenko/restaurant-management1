@@ -34,7 +34,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 .orElseGet(() -> {
                     User newUser = User.builder()
                             .username(email)
-                            .password("") // Google-юзер не має паролю
+                            .password("")
                             .role(Role.USER)
                             .build();
                     return userRepository.save(newUser);
