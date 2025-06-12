@@ -34,32 +34,32 @@ public class SecurityConfig {
                                 "/api/auth/**",
                                 "/oauth2/**",
                                 "/login/**",
-                                "/api/dishes/popular"
+                                "/oauth2/authorization/google",
+                                "/api/dishes/popular",
+                                "/api/dishes/popular-dishes" // уточнення
                         ).permitAll()
 
-                        // Доступ лише для ADMIN
+                        // Доступ лише для ADMIN (пам’ятаємо про ROLE_ префікс)
                         .requestMatchers(
                                 "/api/dishes/**",
-                                "/api/waiters/**",
                                 "/api/categories/**"
-                        ).hasRole("ADMIN")
+                        ).hasAuthority("ADMIN")
 
-                        // Доступ для USER та ADMIN
+                        // USER + ADMIN
                         .requestMatchers(
                                 "/api/orders/**",
                                 "/api/customers/**"
-                        ).hasAnyRole("USER", "ADMIN")
+                        ).hasAnyAuthority("USER", "ADMIN")
 
-                        // Усі інші запити — лише для авторизованих користувачів
+                        // Усі інші маршрути лише для авторизованих користувачів
                         .anyRequest().authenticated()
                 )
 
-                // Stateless: без збереження сесій
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // Обробка помилок авторизації
+                // Обробка помилок
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -68,7 +68,7 @@ public class SecurityConfig {
                         })
                 )
 
-                // Логін через Google OAuth2
+                // Google OAuth2
                 .oauth2Login(oauth -> oauth
                         .successHandler(oAuth2SuccessHandler)
                 );
