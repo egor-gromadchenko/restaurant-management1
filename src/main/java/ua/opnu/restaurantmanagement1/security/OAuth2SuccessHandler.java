@@ -4,8 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -26,33 +25,26 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
-                                        org.springframework.security.core.Authentication authentication) throws IOException, ServletException {
+                                        Authentication authentication) throws IOException, ServletException {
 
-        // Отримуємо email із Google акаунту
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getAttribute("email");
 
-        // Якщо користувача не існує — створюємо
         User user = userRepository.findByUsername(email)
                 .orElseGet(() -> {
                     User newUser = User.builder()
                             .username(email)
-                            .role(Role.USER)  // OAuth-користувач отримує роль USER
+                            .password("") // Google-юзер не має паролю
+                            .role(Role.USER)
                             .build();
                     return userRepository.save(newUser);
                 });
 
-        // Генерація JWT токена
         String token = jwtService.generateToken(user);
 
-        // Установка автентифікації в SecurityContextHolder
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authToken);
-
-        // Виводимо токен у вигляді JSON (працює для Postman)
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write("{\"token\": \"" + token + "\"}");
+        response.getWriter().flush();
     }
 }
