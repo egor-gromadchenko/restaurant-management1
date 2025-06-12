@@ -4,8 +4,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import ua.opnu.restaurantmanagement1.entity.Role;
 import ua.opnu.restaurantmanagement1.entity.User;
@@ -16,7 +18,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class OAuth2SuccessHandler implements org.springframework.security.web.authentication.AuthenticationSuccessHandler {
+public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -24,17 +26,18 @@ public class OAuth2SuccessHandler implements org.springframework.security.web.au
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
-                                        Authentication authentication) throws IOException, ServletException {
+                                        org.springframework.security.core.Authentication authentication) throws IOException, ServletException {
 
+        // Отримуємо email із Google акаунту
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getAttribute("email");
 
-        // Пошук або створення користувача
+        // Якщо користувача не існує — створюємо
         User user = userRepository.findByUsername(email)
                 .orElseGet(() -> {
                     User newUser = User.builder()
                             .username(email)
-                            .role(Role.USER)  // OAuth-користувачам присвоюємо роль USER
+                            .role(Role.USER)  // OAuth-користувач отримує роль USER
                             .build();
                     return userRepository.save(newUser);
                 });
@@ -42,9 +45,14 @@ public class OAuth2SuccessHandler implements org.springframework.security.web.au
         // Генерація JWT токена
         String token = jwtService.generateToken(user);
 
-        // Редірект із токеном у параметрі (використовується для Postman або фронтенду)
-        String redirectUrl = "https://restaurant-management-8wpo.onrender.com/oauth-success?token=" + token;
+        // Установка автентифікації в SecurityContextHolder
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authToken);
 
-        response.sendRedirect(redirectUrl);
+        // Виводимо токен у вигляді JSON (працює для Postman)
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"token\": \"" + token + "\"}");
     }
 }
